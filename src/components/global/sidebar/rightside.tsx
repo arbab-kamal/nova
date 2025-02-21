@@ -76,14 +76,6 @@ const RightSidebar = () => {
   return (
     <>
       {/* Drag handle */}
-      <div
-        className="fixed right-0 top-0 bottom-0 cursor-ew-resize bg-gray-800"
-        style={{
-          right: `${sidebarWidth}px`,
-          width: "1px",
-        }}
-        onMouseDown={() => setIsResizing(true)}
-      />
 
       {/* Sidebar */}
       <div

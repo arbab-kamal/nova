@@ -93,7 +93,9 @@ const Chatbox = () => {
               <div
                 key={index}
                 className={`flex items-start gap-3 mt-8 ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
+                  message.sender === "user"
+                    ? "justify-end"
+                    : "justify-start -ml-6"
                 }`}
               >
                 {message.sender === "ai" && (
@@ -104,8 +106,8 @@ const Chatbox = () => {
                 <div
                   className={`px-6 py-3.5 rounded-2xl ${
                     message.sender === "user"
-                      ? "bg-blue-600 text-white rounded-tr-none"
-                      : "bg-gray-100 text-gray-800 rounded-tl-none"
+                      ? "bg-gray-200 text-gray-800 rounded-tr-none"
+                      : "bg-blue-600 text-white rounded-tl-none"
                   } max-w-[95%] whitespace-pre-wrap break-words`}
                 >
                   {message.sender === "ai" && index === messages.length - 1 ? (
@@ -121,6 +123,7 @@ const Chatbox = () => {
                 )}
               </div>
             ))}
+
             <div ref={messagesEndRef} />
           </div>
         )}
