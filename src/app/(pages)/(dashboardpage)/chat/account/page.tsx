@@ -24,6 +24,23 @@ const MyAccount = () => {
     { title: "SuperNova AI Chatbot", icon: "🤖", version: "v1.0" },
   ];
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        window.location.href = "/auth";
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <>
       <div className="max-w-5xl mx-auto p-6">
@@ -136,7 +153,10 @@ const MyAccount = () => {
             </div>
 
             {/* Logout Button */}
-            <button className="w-full p-3 text-red-500 hover:bg-gray-300 rounded-lg transition-all flex items-center gap-3">
+            <button
+              className="w-full p-3 text-red-500 hover:bg-gray-300 rounded-lg transition-all flex items-center gap-3"
+              onClick={handleLogout}
+            >
               <LogOut size={18} />
               Logout
             </button>

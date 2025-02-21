@@ -1,22 +1,16 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
-import { Settings, Share2, User, File } from "lucide-react";
+import { File } from "lucide-react";
 
 const MIN_SIDEBAR_WIDTH = 256;
 const MAX_SIDEBAR_WIDTH = 800;
 
-// Dummy data for files
-const DUMMY_FILES = [
-  "Annual Report 2024.pdf",
-  "Project Proposal.pdf",
-  "Meeting Notes.pdf",
-  "Budget Analysis.pdf",
-  "Technical Documentation.pdf",
-];
-
 const RightSidebar = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [files, setFiles] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Handle mouse move event for resizing
   const handleMouseMove = useCallback(
@@ -49,11 +43,41 @@ const RightSidebar = () => {
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
+  // Fetch files from backend
+  const fetchFiles = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch("http://localhost:8080/files", {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch files");
+      }
+
+      const data = await response.json();
+      setFiles(data);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch files";
+      setError(errorMessage);
+      console.error("Error fetching files:", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial file fetch
+  useEffect(() => {
+    fetchFiles();
+  }, []);
+
   return (
     <>
       {/* Drag handle */}
       <div
-        className="fixed right-0 top-0 bottom-0 cursor-ew-resize bg-gray-200"
+        className="fixed right-0 top-0 bottom-0 cursor-ew-resize bg-gray-800"
         style={{
           right: `${sidebarWidth}px`,
           width: "1px",
@@ -63,30 +87,28 @@ const RightSidebar = () => {
 
       {/* Sidebar */}
       <div
-        className="fixed right-0 top-0 min-h-screen bg-white border-l border-gray-200 overflow-hidden flex flex-col"
+        className="fixed right-0 top-0 min-h-screen bg-white border-l border-gray-200 overflow-hidden"
         style={{ width: `${sidebarWidth}px` }}
       >
-        <div className="p-4 flex-1 overflow-y-auto">
-          <div className="flex justify-between items-center mb-6">
-            <Settings className="w-6 h-6 text-gray-600" />
-            <div className="flex gap-4">
-              <Share2 className="w-6 h-6 text-gray-600" />
-            </div>
-          </div>
-
-          <nav className="space-y-4">
-            <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded cursor-pointer">
-              <User className="w-5 h-5 flex-shrink-0 text-gray-600" />
-              <span className="text-sm text-gray-800">Demo User</span>
-            </div>
-
-            {/* Files Section */}
-            <div className="mt-6">
-              <h3 className="px-4 text-xs font-medium text-gray-600 mb-2">
-                Your Files
-              </h3>
-              <div className="space-y-1">
-                {DUMMY_FILES.map((fileName, index) => (
+        <div className="p-4">
+          {/* Files Section */}
+          <div className="mt-6">
+            <h3 className="px-4 text-xs font-medium text-gray-600 mb-2">
+              Your Files
+            </h3>
+            <div className="space-y-1">
+              {loading ? (
+                <div className="px-4 py-3 bg-gray-100 rounded">
+                  Loading files...
+                </div>
+              ) : error ? (
+                <div className="px-4 py-3 text-red-500 text-sm">{error}</div>
+              ) : files.length === 0 ? (
+                <div className="px-4 py-3 text-gray-800 text-sm">
+                  No files found
+                </div>
+              ) : (
+                files.map((fileName, index) => (
                   <button
                     key={index}
                     type="button"
@@ -95,10 +117,10 @@ const RightSidebar = () => {
                     <File className="w-5 h-5 text-gray-600 flex-shrink-0" />
                     <span className="text-sm truncate">{fileName}</span>
                   </button>
-                ))}
-              </div>
+                ))
+              )}
             </div>
-          </nav>
+          </div>
         </div>
       </div>
     </>

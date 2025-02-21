@@ -45,7 +45,22 @@ const Sidebar = () => {
     },
     { id: "archive", icon: Archive, label: "Archive", href: "/chat/archive" },
   ];
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "GET",
+        credentials: "include",
+      });
 
+      if (response.ok) {
+        window.location.href = "/auth";
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-blue-600 to-blue-400 p-4 text-white flex flex-col">
       {/* Header */}
@@ -202,7 +217,11 @@ const Sidebar = () => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <Link href={"/auth"} className="flex items-center gap-2">
+              <Link
+                href={"/auth"}
+                className="flex items-center gap-2"
+                onClick={handleLogout}
+              >
                 <LogOut className="w-4 h-4 text-red-500" />
                 <span>Logout</span>
               </Link>
