@@ -9,7 +9,6 @@ interface WelcomeUserProps {
 
 interface UserData {
   username: string;
-  isNewUser: boolean;
 }
 
 const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
@@ -73,14 +72,10 @@ const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
           <User className="w-6 h-6 text-gray-700" />
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
-              {userData.isNewUser
-                ? `Welcome ${userData.username}!`
-                : `Welcome back, ${userData.username}!`}
+              Welcome back, {userData.username}!
             </h2>
             <p className="text-sm text-gray-600">
-              {userData.isNewUser
-                ? "Thanks for joining us!"
-                : "We're glad to see you again."}
+              We&apos;re glad to see you again.
             </p>
           </div>
         </div>
