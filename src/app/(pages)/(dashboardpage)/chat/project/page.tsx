@@ -1,5 +1,7 @@
+import ProjectDashboard from "@/components/global/project/project";
+
 const Project = () => {
-  return <div>Project</div>;
+  return <ProjectDashboard />;
 };
 
 export default Project;
