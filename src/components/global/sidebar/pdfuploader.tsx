@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "@/components/ui/use-toast"; // Assuming you have toast component
+import { toast } from "sonner"; // Assuming you have toast component
 
 const PDF_UPLOADER = "http://localhost:8080/upload";
 
