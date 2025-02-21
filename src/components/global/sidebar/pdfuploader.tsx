@@ -9,8 +9,16 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "@/components/ui/use-toast"; // Assuming you have toast component
 
 const PDF_UPLOADER = "http://localhost:8080/upload";
+
+// Type for file upload response
+interface UploadResponse {
+  success: boolean;
+  message?: string;
+  fileUrl?: string;
+}
 
 const MultiplePDFUploader = () => {
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -19,12 +27,18 @@ const MultiplePDFUploader = () => {
       progress: number;
       status: "idle" | "uploading" | "completed" | "error";
       error?: string;
+      fileUrl?: string;
     }>
   >([]);
   const [isOpen, setIsOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const abortControllersRef = useRef<Map<number, AbortController>>(new Map());
 
   const uploadFile = useCallback(async (file: File, fileIndex: number) => {
+    // Create new AbortController for this upload
+    const abortController = new AbortController();
+    abortControllersRef.current.set(fileIndex, abortController);
+
     setUploadedFiles((prev) =>
       prev.map((item, index) =>
         index === fileIndex
@@ -42,40 +56,48 @@ const MultiplePDFUploader = () => {
     formData.append("file", file);
 
     try {
-      const xhr = new XMLHttpRequest();
+      const response = await fetch(PDF_UPLOADER, {
+        method: "POST",
+        body: formData,
+        signal: abortController.signal,
+        // Add any required headers your API needs
+        headers: {
+          // 'Authorization': 'Bearer your-token-here', // If needed
+        },
+      });
 
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setUploadedFiles((prev) =>
-            prev.map((item, index) =>
-              index === fileIndex ? { ...item, progress } : item
-            )
-          );
-        }
-      };
+      if (!response.ok) {
+        throw new Error(`Upload failed with status: ${response.status}`);
+      }
 
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          setUploadedFiles((prev) =>
-            prev.map((item, index) =>
-              index === fileIndex
-                ? { ...item, status: "completed" as const, progress: 100 }
-                : item
-            )
-          );
-        } else {
-          throw new Error(`Upload failed with status: ${xhr.status}`);
-        }
-      };
+      const data: UploadResponse = await response.json();
 
-      xhr.onerror = () => {
-        throw new Error("Upload failed due to network error");
-      };
-
-      xhr.open("POST", PDF_UPLOADER);
-      await xhr.send(formData);
+      if (data.success) {
+        setUploadedFiles((prev) =>
+          prev.map((item, index) =>
+            index === fileIndex
+              ? {
+                  ...item,
+                  status: "completed" as const,
+                  progress: 100,
+                  fileUrl: data.fileUrl,
+                }
+              : item
+          )
+        );
+        toast({
+          title: "Success",
+          description: `${file.name} uploaded successfully`,
+        });
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
     } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("Upload cancelled");
+        return;
+      }
+
       setUploadedFiles((prev) =>
         prev.map((item, index) =>
           index === fileIndex
@@ -88,7 +110,14 @@ const MultiplePDFUploader = () => {
             : item
         )
       );
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to upload ${file.name}`,
+      });
       console.error("Upload error:", error);
+    } finally {
+      abortControllersRef.current.delete(fileIndex);
     }
   }, []);
 
@@ -114,13 +143,23 @@ const MultiplePDFUploader = () => {
           uploadFile(file, fileIndex);
         });
       } else {
-        console.warn("Please upload valid PDF files.");
+        toast({
+          variant: "destructive",
+          title: "Invalid files",
+          description: "Please upload valid PDF files only.",
+        });
       }
     },
     [uploadFile, uploadedFiles.length]
   );
 
   const handleRemoveFile = useCallback((index: number) => {
+    // Cancel ongoing upload if exists
+    const controller = abortControllersRef.current.get(index);
+    if (controller) {
+      controller.abort();
+    }
+
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
 
     if (fileInputRef.current) {
@@ -223,7 +262,7 @@ const MultiplePDFUploader = () => {
                   <div className="mt-2 text-xs text-center text-gray-500">
                     {fileData.status === "completed"
                       ? "Completed"
-                      : `${fileData.progress}% Uploaded`}
+                      : `Uploading...`}
                   </div>
                 </>
               )}

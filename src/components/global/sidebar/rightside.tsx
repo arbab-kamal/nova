@@ -92,8 +92,8 @@ const RightSidebar = () => {
       >
         <div className="p-4">
           {/* Files Section */}
-          <div className="mt-6">
-            <h3 className="px-4 text-xs font-medium text-gray-600 mb-2">
+          <div className="mt-10">
+            <h3 className="px-4 text-xs font-medium text-gray-600 mt-16">
               Your Document
             </h3>
             <div className="space-y-1">
