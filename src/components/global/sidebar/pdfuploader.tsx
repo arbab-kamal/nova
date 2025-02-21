@@ -90,29 +90,48 @@ const MultiplePDFUploader = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch(PDF_UPLOADER, {
-        method: "POST",
-        body: formData,
-        signal: abortController.signal,
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded * 100) / event.total);
+          setUploadedFiles((prev) =>
+            prev.map((item, index) =>
+              index === fileIndex ? { ...item, progress } : item
+            )
+          );
+        }
       });
 
-      // Simulate upload progress (remove in production)
-      const simulateProgress = setInterval(() => {
-        setUploadedFiles((prev) =>
-          prev.map((item, index) =>
-            index === fileIndex && item.status === "uploading"
-              ? { ...item, progress: Math.min(item.progress + 10, 99) }
-              : item
-          )
+      const uploadPromise = new Promise((resolve, reject) => {
+        xhr.addEventListener("load", () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (error) {
+              reject(new Error("Invalid response format"));
+            }
+          } else {
+            reject(new Error(`Upload failed with status: ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener("error", () =>
+          reject(new Error("Network error occurred"))
         );
-      }, 500);
 
-      if (!response.ok) {
-        throw new Error(`Upload failed with status: ${response.status}`);
-      }
+        xhr.addEventListener("abort", () =>
+          reject(new Error("Upload cancelled"))
+        );
+      });
 
-      const data: UploadResponse = await response.json();
-      clearInterval(simulateProgress);
+      xhr.open("POST", PDF_UPLOADER);
+      xhr.send(formData);
+
+      abortController.signal.addEventListener("abort", () => xhr.abort());
+
+      const data: UploadResponse = await uploadPromise;
 
       if (data.success) {
         setUploadedFiles((prev) =>
@@ -150,6 +169,7 @@ const MultiplePDFUploader = () => {
         )
       );
       toast.error(`Failed to upload ${file.name}`);
+      console.error("Upload error:", error);
     } finally {
       abortControllersRef.current.delete(fileIndex);
     }
@@ -225,7 +245,7 @@ const MultiplePDFUploader = () => {
       case "uploading":
         return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
       case "completed":
-        return <CheckCircle2 className="w-4 h-4 text-blue-500" />;
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
       case "error":
         return <AlertCircle className="w-4 h-4 text-red-500" />;
       default:
@@ -318,7 +338,7 @@ const MultiplePDFUploader = () => {
                   <div className="flex items-center gap-2">
                     <FileStatusIcon status={fileData.status} />
                     <button
-                      className="p-1 text-gray-400 hover:text-blue-600 rounded-full"
+                      className="p-1 text-gray-400 hover:text-red-600 rounded-full"
                       onClick={() => handleRemoveFile(index)}
                       disabled={fileData.status === "uploading"}
                       aria-label="Remove file"
