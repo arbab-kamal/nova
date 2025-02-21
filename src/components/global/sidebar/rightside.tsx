@@ -94,7 +94,7 @@ const RightSidebar = () => {
           {/* Files Section */}
           <div className="mt-6">
             <h3 className="px-4 text-xs font-medium text-gray-600 mb-2">
-              Your Files
+              Your Document
             </h3>
             <div className="space-y-1">
               {loading ? (

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { User } from "lucide-react";
 
@@ -6,16 +7,21 @@ interface WelcomeUserProps {
   className?: string;
 }
 
+interface UserData {
+  username: string;
+  isNewUser: boolean;
+}
+
 const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
-  const [username, setUsername] = useState<string>("");
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUsername();
+    fetchUserData();
   }, []);
 
-  const fetchUsername = async () => {
+  const fetchUserData = async () => {
     try {
       setLoading(true);
       const response = await fetch("http://localhost:8080/userName", {
@@ -24,13 +30,13 @@ const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setUsername("");
+          setUserData(null);
         } else {
           throw new Error(`Failed to fetch username: ${response.statusText}`);
         }
       } else {
-        const data = await response.text();
-        setUsername(data);
+        const data = await response.json();
+        setUserData(data);
       }
     } catch (err: unknown) {
       const errorMessage =
@@ -62,15 +68,19 @@ const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
 
   return (
     <div className={`p-4 rounded-lg bg-gray-100 ${className}`}>
-      {username ? (
+      {userData ? (
         <div className="flex items-center gap-3">
           <User className="w-6 h-6 text-gray-700" />
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
-              Welcome back, {username}!
+              {userData.isNewUser
+                ? `Welcome ${userData.username}!`
+                : `Welcome back, ${userData.username}!`}
             </h2>
             <p className="text-sm text-gray-600">
-              We&apos;re glad to see you again.
+              {userData.isNewUser
+                ? "Thanks for joining us!"
+                : "We're glad to see you again."}
             </p>
           </div>
         </div>
