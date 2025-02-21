@@ -29,15 +29,27 @@ const MyAccount = () => {
       const response = await fetch("http://localhost:8080/logout", {
         method: "GET",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (response.ok) {
+        // Clear any local storage items if you're using them
+        localStorage.clear();
+        // Clear any session storage items
+        sessionStorage.clear();
+        // Redirect to auth page
         window.location.href = "/auth";
       } else {
-        console.error("Logout failed");
+        throw new Error(
+          `Logout failed: ${response.status} ${response.statusText}`
+        );
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      // Optionally show an error message to the user
+      alert("Failed to logout. Please try again.");
     }
   };
 

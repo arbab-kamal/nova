@@ -50,15 +50,25 @@ const Sidebar = () => {
       const response = await fetch("http://localhost:8080/logout", {
         method: "GET",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (response.ok) {
+        // Clear any local storage/session storage if you're using them
+        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = "/auth";
       } else {
-        console.error("Logout failed");
+        throw new Error(
+          `Logout failed: ${response.status} ${response.statusText}`
+        );
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      // Optionally show an error message to the user
+      alert("Failed to logout. Please try again.");
     }
   };
   return (
@@ -216,15 +226,12 @@ const Sidebar = () => {
                 <span>Account</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <Link
-                href={"/auth"}
-                className="flex items-center gap-2"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4 text-red-500" />
-                <span>Logout</span>
-              </Link>
+            <DropdownMenuItem
+              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 text-red-500" />
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
