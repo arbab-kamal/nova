@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Upload, FileIcon, Loader2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +16,7 @@ const PDF_UPLOADER = "http://localhost:8080/upload";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const MultiplePDFUploader = () => {
+  const router = useRouter();
   const [uploadedFiles, setUploadedFiles] = useState<
     Array<{
       file: File;
@@ -26,6 +28,12 @@ const MultiplePDFUploader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getProgressColor = (progress: number) => {
+    if (progress <= 30) return "bg-red-500";
+    if (progress <= 70) return "bg-yellow-500";
+    return "bg-green-500";
+  };
 
   const validateFile = (file: File): string | null => {
     if (file.type !== "application/pdf") {
@@ -78,6 +86,11 @@ const MultiplePDFUploader = () => {
             )
           );
           toast.success(`${file.name} uploaded successfully`);
+
+          // Refresh the page after a short delay
+          setTimeout(() => {
+            router.refresh(); // Efficiently refreshes the page in Next.js
+          }, 2000); // Delay for user to see the toast
         } else {
           throw new Error(`Upload failed with status: ${xhr.status}`);
         }
@@ -274,10 +287,14 @@ const MultiplePDFUploader = () => {
                 </div>
               ) : (
                 <>
-                  <Progress
-                    value={fileData.progress}
-                    className="h-2 w-full bg-gray-100"
-                  />
+                  <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-300 ${getProgressColor(
+                        fileData.progress
+                      )}`}
+                      style={{ width: `${fileData.progress}%` }}
+                    />
+                  </div>
                   <div className="mt-2 text-xs text-center text-gray-500">
                     {fileData.status === "completed"
                       ? "Completed"
