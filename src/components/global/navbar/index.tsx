@@ -1,16 +1,13 @@
-"use client";
 import React from "react";
 import {
   Moon,
-  Bookmark,
-  FolderPlus,
-  Trash2,
   Menu,
   Bot,
   FileText,
   GitBranch,
   Info,
   Globe,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -21,15 +18,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import BookmarkModal from "./bookmark";
+import ProjectModal from "./project";
+
 const ArticleNavbar = () => {
-  // const router = useRouter();
-  // const pathname = usePathname();
-
-  // Function to switch language while keeping the current path
-  // const switchLanguage = (lang: string) => {
-  //   router.replace(`/${lang}${pathname.substring(3)}`);
-  // };
-
   return (
     <div className="relative">
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b w-full">
@@ -66,17 +58,8 @@ const ArticleNavbar = () => {
 
         {/* Right Side */}
         <div className="flex items-center space-x-3">
-          {/* Save to Bookmark */}
-          <button className="flex items-center px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
-            <Bookmark className="w-4 h-4 mr-2" />
-            Save to Bookmark
-          </button>
-
-          {/* Save to Project */}
-          <button className="flex items-center px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
-            <FolderPlus className="w-4 h-4 mr-2" />
-            Save to Project
-          </button>
+          <BookmarkModal />
+          <ProjectModal />
 
           {/* Theme Selector */}
           <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
