@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
 import {
@@ -26,8 +26,54 @@ import { usePathname } from "next/navigation";
 const Sidebar = () => {
   const [isPromptOpen, setIsPromptOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
+  const [email, setEmail] = useState<string | null>(null);
 
   const pathname = usePathname();
+
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/addUser", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch email");
+
+        const data = await response.json();
+        setEmail(data.email); // Assuming API returns { email: "user@example.com" }
+      } catch (error) {
+        console.error("Error fetching email:", error);
+        setEmail("Unknown User"); // Fallback if error occurs
+      }
+    };
+
+    fetchEmail();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/auth";
+      } else {
+        throw new Error(
+          `Logout failed: ${response.status} ${response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+      alert("Failed to logout. Please try again.");
+    }
+  };
 
   const navItems = [
     {
@@ -45,32 +91,7 @@ const Sidebar = () => {
     },
     { id: "archive", icon: Archive, label: "Archive", href: "/chat/archive" },
   ];
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/logout", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
 
-      if (response.ok) {
-        // Clear any local storage/session storage if you're using them
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = "/auth";
-      } else {
-        throw new Error(
-          `Logout failed: ${response.status} ${response.statusText}`
-        );
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-      // Optionally show an error message to the user
-      alert("Failed to logout. Please try again.");
-    }
-  };
   return (
     <div className="w-64 h-screen bg-gradient-to-b from-blue-600 to-blue-400 p-4 text-white flex flex-col">
       {/* Header */}
@@ -89,7 +110,7 @@ const Sidebar = () => {
         </Button>
       </Link>
 
-      {/* Scrollable middle section */}
+      {/* Scrollable Middle Section */}
       <div className="flex-1 overflow-y-auto space-y-6">
         {/* Prompt Assist Section */}
         <div>
@@ -116,7 +137,6 @@ const Sidebar = () => {
               <div className="text-xs text-white/70 mb-2 uppercase ml-6">
                 SUGGESTION
               </div>
-
               <div className="space-y-2">
                 <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer">
                   <div className="font-medium">Articles</div>
@@ -136,54 +156,35 @@ const Sidebar = () => {
         </div>
 
         <Separator className="my-2 bg-white/20" />
+
         {/* History Section */}
         <div>
-          <Link href="/chat/history" className="block">
+          <Link href="/chat/history">
             <button
-              className={`flex items-center justify-between w-full mb-2 p-2 rounded-md 
-                ${
-                  pathname === "/chat/history"
-                    ? "bg-white/20"
-                    : "hover:bg-white/10"
-                }`}
+              className={`flex items-center justify-between w-full mb-2 p-2 rounded-md ${
+                pathname === "/chat/history"
+                  ? "bg-white/20"
+                  : "hover:bg-white/10"
+              }`}
             >
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 <span className="font-medium">History</span>
               </div>
-              {isHistoryOpen ? (
-                <ChevronDown
-                  className="w-4 h-4"
-                  onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-                />
-              ) : (
-                <ChevronUp
-                  className="w-4 h-4"
-                  onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-                />
-              )}
             </button>
           </Link>
-          {isHistoryOpen && (
-            <div className="space-y-2 ml-6">
-              <div className="hover:bg-white/10 rounded-md p-2 cursor-pointer">
-                How to Calibrate Monitor?
-              </div>
-              <div className="hover:bg-white/10 rounded-md p-2 cursor-pointer">
-                Can you help me to create a Canva?
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
       <Separator className="my-2 bg-white/20" />
+
       {/* Bottom Navigation */}
       <div className="space-y-2 mt-6">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
-            <Link href={item.href} key={item.id} className="block">
+            <Link href={item.href} key={item.id}>
               <Button
                 variant="ghost"
                 className={`w-full justify-start text-white hover:text-white ${
@@ -192,12 +193,8 @@ const Sidebar = () => {
                     : "hover:bg-white/10"
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <Icon className="w-4 h-4 mr-2 text-white" />
-                    <span className="text-white">{item.label}</span>
-                  </div>
-                </div>
+                <Icon className="w-4 h-4 mr-2 text-white" />
+                <span className="text-white">{item.label}</span>
               </Button>
             </Link>
           );
@@ -205,31 +202,27 @@ const Sidebar = () => {
 
         <Separator className="my-2 bg-white/20" />
 
+        {/* Profile Dropdown */}
         <DropdownMenu>
-          {/* Profile Trigger */}
           <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg cursor-pointer w-full">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
               <MessageCircle className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 text-left">
-              <div className="text-sm font-medium">kamal@example.com</div>
+              <div className="text-sm font-medium">{email || "Loading..."}</div>
               <div className="text-xs text-white/70">Free Plan</div>
             </div>
             <ChevronDown className="w-4 h-4 text-white" />
           </DropdownMenuTrigger>
 
-          {/* Dropdown Menu */}
           <DropdownMenuContent className="w-48 bg-white text-gray-800 rounded-lg shadow-md mt-2">
-            <DropdownMenuItem className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <Link href={"/chat/account"} className="flex items-center gap-2">
+            <DropdownMenuItem>
+              <Link href="/chat/account" className="flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-600" />
                 <span>Account</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleLogout}
-            >
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="w-4 h-4 text-red-500" />
               <span>Logout</span>
             </DropdownMenuItem>
