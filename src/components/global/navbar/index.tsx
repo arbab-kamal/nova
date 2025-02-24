@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Moon,
@@ -8,6 +9,7 @@ import {
   Info,
   Globe,
   Trash2,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,8 +22,11 @@ import {
 
 import BookmarkModal from "./bookmark";
 import ProjectModal from "./project";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 const ArticleNavbar = () => {
+  const { setTheme } = useTheme();
   return (
     <div className="relative">
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b w-full">
@@ -62,9 +67,26 @@ const ArticleNavbar = () => {
           <ProjectModal />
 
           {/* Theme Selector */}
-          <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
-            <Moon className="w-5 h-5" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Dropdown Menu */}
           <DropdownMenu>

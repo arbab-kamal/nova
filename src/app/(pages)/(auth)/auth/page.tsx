@@ -284,6 +284,20 @@ export const AuthTabs = () => {
                         required
                       />
                     </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        className="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="terms"
+                        className="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                      >
+                        I agree to Supernova AI Chatbot License Agreement,
+                        Terms, & Privacy Policy
+                      </label>
+                    </div>
                     <Button
                       type="submit"
                       disabled={isLoading}

@@ -30,18 +30,43 @@ const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
       if (!response.ok) {
         if (response.status === 401) {
           setUserData(null);
+          return;
+        }
+        throw new Error(`Failed to fetch username: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      let data: UserData;
+
+      if (contentType?.includes("application/json")) {
+        const jsonData = await response.json();
+        data = jsonData;
+      } else {
+        const textData = await response.text();
+        data = { username: textData.trim() };
+      }
+
+      if (typeof data === "string") {
+        setUserData({ username: data });
+      } else if (typeof data === "object" && data !== null) {
+        if ("username" in data) {
+          setUserData(data as UserData);
         } else {
-          throw new Error(`Failed to fetch username: ${response.statusText}`);
+          const firstValue = Object.values(data)[0];
+          if (typeof firstValue === "string") {
+            setUserData({ username: firstValue });
+          } else {
+            throw new Error("Invalid data format");
+          }
         }
       } else {
-        const data = await response.json();
-        setUserData(data);
+        throw new Error("Invalid data format");
       }
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error fetching username";
       setError(errorMessage);
-      console.error(errorMessage);
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
