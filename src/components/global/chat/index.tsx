@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 import Typewriter from "./typewriter";
-import WelcomeUser from "./Welcome"; // Import WelcomeUser component
+import WelcomeUser from "./Welcome";
 
 interface Message {
   text: string;
@@ -14,7 +14,27 @@ const Chatbox = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userInitial, setUserInitial] = useState<string>("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/userName");
+        if (!res.ok) throw new Error("Failed to fetch username");
+
+        const data = await res.json();
+        if (data.name) {
+          setUserInitial(data.name.charAt(0).toUpperCase());
+        }
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,14 +54,10 @@ const Chatbox = () => {
 
       const res = await fetch(url, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Error: ${res.status}`);
 
       const data = await res.text();
       return data;
@@ -70,8 +86,7 @@ const Chatbox = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
-      {messages.length === 0 && <WelcomeUser />}{" "}
-      {/* Show WelcomeUser only if no messages */}
+      {messages.length === 0 && <WelcomeUser />}
       <div className="flex-1 overflow-y-auto mb-20 pt-4 px-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-4">
@@ -118,12 +133,11 @@ const Chatbox = () => {
                 </div>
                 {message.sender === "user" && (
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm">U</span>
+                    <span className="text-sm">{userInitial || "U"}</span>
                   </div>
                 )}
               </div>
             ))}
-
             <div ref={messagesEndRef} />
           </div>
         )}
