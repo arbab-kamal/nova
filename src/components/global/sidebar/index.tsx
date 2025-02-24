@@ -139,9 +139,9 @@ const Sidebar = () => {
               </div>
               <div className="space-y-2">
                 <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer">
-                  <div className="font-medium">Articles</div>
+                  <div className="font-medium">RiskGpt</div>
                   <div className="text-sm text-white/70">
-                    Generate great article with any topics you want
+                    Analyzed Your Document
                   </div>
                 </div>
                 <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer">
@@ -159,20 +159,29 @@ const Sidebar = () => {
 
         {/* History Section */}
         <div>
-          <Link href="/chat/history">
-            <button
-              className={`flex items-center justify-between w-full mb-2 p-2 rounded-md ${
-                pathname === "/chat/history"
-                  ? "bg-white/20"
-                  : "hover:bg-white/10"
-              }`}
-            >
+          <button
+            className={`flex items-center justify-between w-full mb-2 p-2 rounded-md ${
+              pathname === "/chat/history" ? "bg-white/20" : "hover:bg-white/10"
+            }`}
+          >
+            <Link href="/chat/history">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 <span className="font-medium">History</span>
               </div>
-            </button>
-          </Link>
+            </Link>
+            {isHistoryOpen ? (
+              <ChevronDown
+                className="w-4 h-4"
+                onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+              />
+            ) : (
+              <ChevronUp
+                className="w-4 h-4"
+                onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+              />
+            )}
+          </button>
         </div>
       </div>
 
