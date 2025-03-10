@@ -111,10 +111,10 @@ const Sidebar = () => {
       </Link>
 
       {/* Scrollable Middle Section */}
-      <div className="flex-1 overflow-y-auto space-y-6">
+      <div className="flex-1 overflow-hidden space-y-6 ">
         {/* Prompt Assist Section */}
         <div>
-          <button className="flex items-center justify-between w-full mb-2 hover:bg-white/10 p-2 rounded-md">
+          <button className="flex items-center justify-between w-full mb-2 hover:bg-white/10 p-2 rounded-md ">
             <div className="flex items-center gap-2">
               <Wand2 className="w-4 h-4" />
               <span className="font-medium">Prompt Assist</span>
@@ -134,20 +134,20 @@ const Sidebar = () => {
 
           {isPromptOpen && (
             <>
-              <div className="text-xs text-white/70 mb-2 uppercase ml-6">
+              <div className="text-xs text-white/70 mb-2 uppercase ml-6 ">
                 SUGGESTION
               </div>
               <div className="space-y-2">
-                <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer">
-                  <div className="font-medium">RiskGpt</div>
+                <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer ">
+                  <div className="font-medium">Risk</div>
                   <div className="text-sm text-white/70">
-                    Analyzed Your Document
+                    Analyzed Your BRD Technological Risk
                   </div>
                 </div>
                 <div className="ml-6 hover:bg-white/10 rounded-md p-2 cursor-pointer">
-                  <div className="font-medium">Academic Writer</div>
+                  <div className="font-medium">Tech Risk</div>
                   <div className="text-sm text-white/70">
-                    Generate song/lyrics with any genre that you love
+                    Summarized The Document
                   </div>
                 </div>
               </div>

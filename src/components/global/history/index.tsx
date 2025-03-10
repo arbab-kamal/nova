@@ -1,53 +1,51 @@
 import React from "react";
-import { Search, Music, ArrowRight } from "lucide-react";
+import { Search, Music, ArrowRight, Computer } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
 const HistoryPage = () => {
   const historyData = {
     today: [
       {
-        title: "Create a Song",
-        description:
-          "AI content I'll be delighted to help you create it easily",
+        title: "Debugging AI Model",
+        description: "Resolved accuracy issues in the latest LLM deployment.",
       },
     ],
     yesterday: [
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Database Optimization",
+        description: "Improved query performance for high-traffic endpoints.",
       },
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Security Audit",
+        description: "Conducted a security check on API authentication flows.",
       },
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Frontend Enhancement",
+        description: "Refactored UI components for better reusability.",
       },
     ],
     "12 Feb": [
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Cloud Deployment",
+        description: "Deployed backend services to AWS Lambda.",
       },
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "API Rate Limiting",
+        description: "Implemented rate limiting to prevent abuse.",
       },
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "AI Model Training",
+        description: "Trained a new dataset for chatbot responses.",
       },
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Code Review",
+        description: "Reviewed PRs and optimized state management in Redux.",
       },
     ],
     "11 Feb": [
       {
-        title: "Create a Song",
-        description: "AI content I'll be delighted to help you...",
+        title: "Bug Fixing",
+        description: "Patched memory leak in the real-time data pipeline.",
       },
     ],
   };
@@ -86,7 +84,7 @@ const HistoryPage = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-blue-100 rounded-lg">
-                        <Music className="h-5 w-5 text-blue-600" />
+                        <Computer className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="mt-1">
                         <h3 className="font-medium mb-1">{item.title}</h3>

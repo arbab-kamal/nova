@@ -13,9 +13,9 @@ const ProjectDashboard = () => {
   const projects = [
     {
       id: 1,
-      title: "Design Studio Copywriting",
+      title: "Cybersecurity Risk Assessment",
       description:
-        "This project is for copywriting purpose. Make easier to create copy for client and design.",
+        "Analyzed vulnerabilities in API authentication and mitigated security threats.",
       image: "/book.jpg",
       admin: "James Cargo",
       chatCount: 12,
@@ -23,9 +23,9 @@ const ProjectDashboard = () => {
     },
     {
       id: 2,
-      title: "All Movie Series Project",
+      title: "Tech Risk Documentation",
       description:
-        "This project is for copywriting purpose. Make easier to create copy for movie and series.",
+        "Created a structured report on potential risks in microservices architecture.",
       image: "/book2.jpg",
       admin: "James Cargo",
       chatCount: 12,

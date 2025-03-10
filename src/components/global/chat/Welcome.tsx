@@ -83,9 +83,7 @@ const WelcomeUser: React.FC<WelcomeUserProps> = ({ className = "" }) => {
   if (error) {
     return (
       <div className={`p-4 rounded-lg bg-gray-100 ${className}`}>
-        <p className="text-sm text-red-400">
-          Something went wrong. Please try again.
-        </p>
+        <p className="text-sm text-red-400">Error fetching username</p>
       </div>
     );
   }
